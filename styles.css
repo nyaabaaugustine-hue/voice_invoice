@@ -325,7 +325,6 @@ p  { line-height: 1.6; color: var(--muted); font-size: 0.9rem; }
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
-.inv-meta-cell { }
 .inv-meta-cell .lbl {
   font-size: 0.6rem; font-weight: 700;
   letter-spacing: 1px; text-transform: uppercase;
@@ -430,7 +429,6 @@ p  { line-height: 1.6; color: var(--muted); font-size: 0.9rem; }
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 10px; margin-bottom: 14px;
 }
-.field-group { }
 .field-group label {
   font-size: 0.65rem; font-weight: 700;
   letter-spacing: 1px; text-transform: uppercase;
@@ -683,6 +681,152 @@ p  { line-height: 1.6; color: var(--muted); font-size: 0.9rem; }
 .toast.success { border-color: var(--accent-dim); color: var(--accent); }
 .toast.error   { border-color: rgba(255,92,92,0.3); color: var(--red); }
 
+/* ── DOC TYPE SWITCHER ──────────────────────────────────────── */
+.doc-type-switcher {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 4px;
+}
+.doc-type-btn {
+  flex: 1;
+  padding: 9px 14px;
+  border-radius: calc(var(--radius-md) - 2px);
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-head);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: -0.2px;
+}
+.doc-type-btn.active {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+.doc-type-btn:not(.active):hover {
+  color: var(--text);
+  background: var(--surface2);
+}
+
+/* ── SHARE GRID ──────────────────────────────────────────────── */
+.share-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted2);
+  font-family: var(--font-mono);
+  margin-bottom: 10px;
+  display: block;
+}
+.share-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-hi);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-head);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: 100%;
+}
+.share-btn:hover { transform: translateY(-1px); }
+.share-btn:active { transform: translateY(0); }
+.share-icon {
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.share-icon svg { width: 20px; height: 20px; }
+.share-text { font-size: 0.85rem; }
+
+.share-wa  { background: #25D366; border-color: #25D366; color: #fff; }
+.share-wa:hover  { background: #1EB858; border-color: #1EB858; }
+.share-tg  { background: #2CA5E0; border-color: #2CA5E0; color: #fff; }
+.share-tg:hover  { background: #1a90cc; border-color: #1a90cc; }
+.share-sms { background: var(--surface); }
+.share-sms:hover { background: var(--surface2); border-color: var(--accent-dim); }
+.share-email { background: var(--surface); }
+.share-email:hover { background: var(--surface2); border-color: var(--accent-dim); }
+
+/* ── TAX TOGGLE GRID ─────────────────────────────────────────── */
+.tax-toggle-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.tax-toggle-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s;
+}
+.tax-toggle-item.active {
+  border-color: var(--accent-dim);
+  background: rgba(78,255,145,0.04);
+}
+.tax-toggle-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.tax-toggle-rate {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+.tax-toggle-switch {
+  width: 44px; height: 24px;
+  background: var(--surface2);
+  border: 1px solid var(--border-hi);
+  border-radius: 100px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.tax-toggle-switch::after {
+  content: '';
+  position: absolute;
+  left: 3px; top: 3px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--muted2);
+  transition: all 0.2s;
+}
+.tax-toggle-item.active .tax-toggle-switch {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+.tax-toggle-item.active .tax-toggle-switch::after {
+  left: calc(100% - 19px);
+  background: var(--accent);
+}
+
 /* ── UTILITY ─────────────────────────────────────────────── */
 .divider { height: 1px; background: var(--border); margin: 20px 0; }
 .mt8  { margin-top: 8px; }
@@ -690,3 +834,148 @@ p  { line-height: 1.6; color: var(--muted); font-size: 0.9rem; }
 .mt24 { margin-top: 24px; }
 .hidden { display: none !important; }
 .mono { font-family: var(--font-mono); }
+
+/* -- DOC TYPE SWITCHER -------------------------------------- */
+.doc-type-switcher {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 4px;
+}
+.doc-type-btn {
+  flex: 1;
+  padding: 9px 14px;
+  border-radius: calc(var(--radius-md) - 2px);
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-head);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: -0.2px;
+}
+.doc-type-btn.active {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+.doc-type-btn:not(.active):hover {
+  color: var(--text);
+  background: var(--surface2);
+}
+
+/* -- SHARE GRID --------------------------------------------- */
+.share-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted2);
+  font-family: var(--font-mono);
+  margin-bottom: 10px;
+  display: block;
+}
+.share-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-hi);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-head);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: 100%;
+}
+.share-btn:hover { transform: translateY(-1px); }
+.share-btn:active { transform: translateY(0); }
+.share-icon {
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.share-icon svg { width: 20px; height: 20px; }
+.share-text { font-size: 0.85rem; }
+.share-wa  { background: #25D366; border-color: #25D366; color: #fff; }
+.share-wa:hover  { background: #1EB858; border-color: #1EB858; }
+.share-tg  { background: #2CA5E0; border-color: #2CA5E0; color: #fff; }
+.share-tg:hover  { background: #1a90cc; border-color: #1a90cc; }
+.share-sms { background: var(--surface); }
+.share-sms:hover { background: var(--surface2); border-color: var(--accent-dim); }
+.share-email { background: var(--surface); }
+.share-email:hover { background: var(--surface2); border-color: var(--accent-dim); }
+
+/* -- TAX TOGGLE GRID ---------------------------------------- */
+.tax-toggle-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.tax-toggle-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s;
+}
+.tax-toggle-item.active {
+  border-color: var(--accent-dim);
+  background: rgba(78,255,145,0.04);
+}
+.tax-toggle-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.tax-toggle-rate {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+.tax-toggle-switch {
+  width: 44px; height: 24px;
+  background: var(--surface2);
+  border: 1px solid var(--border-hi);
+  border-radius: 100px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.tax-toggle-switch::after {
+  content: '';
+  position: absolute;
+  left: 3px; top: 3px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--muted2);
+  transition: all 0.2s;
+}
+.tax-toggle-item.active .tax-toggle-switch {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+.tax-toggle-item.active .tax-toggle-switch::after {
+  left: calc(100% - 19px);
+  background: var(--accent);
+}

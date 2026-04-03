@@ -15,14 +15,6 @@ const sql = neon(process.env.DATABASE_URL);
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from the root directory
-app.use(express.static(path.join(__dirname, '.')));
-
-// Handle the root route to serve index.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
 // --- HEALTH CHECK ---
 app.get('/api', (req, res) => {
   res.json({ status: "VoiceInvoice API is running", version: "1.0.0" });
