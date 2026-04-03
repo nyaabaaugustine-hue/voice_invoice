@@ -10,37 +10,11 @@ const Invoice = (() => {
   async function parseText(text) {
     App.showLoading('Understanding your sale...');
 
-    const prompt = `You are an invoice parser for a Ghanaian market seller. Extract invoice data from the spoken/typed description below.
-Return ONLY valid JSON.
-Do not include any conversational text or markdown code blocks.
-
-Input: "${text}"
-
-Expected JSON shape:
-{
-  "customer": "customer name, or 'Customer' if not mentioned",
-  "items": [
-    { "name": "item name", "qty": <number>, "price": <unit price as number> }
-  ]
-}
-
-Rules:
-- If a unit price is stated ("50 cedis each", "50 a piece"), use it directly as price.
-- If a total for multiple items is stated ("3 shirts 150 cedis"), price = total / qty.
-- If no price is mentioned at all, set price to 0.
-- Handle Ghanaian pidgin/informal speech: "give am", "pieces", "pcs", "waakye", "kenkey", "pure water", "banku", "fufu", "jollof", "trotro", "cedis", "pesewas" etc.
-- Qty must be a positive integer. Price must be a non-negative number.
-- Customer name is usually the first proper noun. If absent use "Customer".
-- Return items as an array even if only one item.`;
-
     try {
       const res = await fetch(`${CONFIG.API_BASE_URL}/parse`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: text,
-          prompt: prompt
-        })
+        body: JSON.stringify({ text: text })
       });
 
       const parsed = await res.json();
