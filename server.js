@@ -85,10 +85,13 @@ Expected JSON:
 
     const data = await response.json();
     if (data.error) {
-      return res.status(data.status || 500).json(data.error);
+      const code = Number.isInteger(data.status) ? data.status : 500;
+      return res.status(code).json(data.error);
     }
 
-    const rawContent = data.choices[0].message.content;
+    const rawContent = data.choices?.[0]?.message?.content;
+    if (!rawContent) throw new Error("AI returned an empty response");
+
     // Extract the JSON object even if the AI included conversational text or markdown
     const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
     const content = jsonMatch ? jsonMatch[0] : rawContent;
@@ -175,7 +178,7 @@ app.delete('/api/history', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 
