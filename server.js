@@ -45,7 +45,7 @@ app.post('/api/parse', async (req, res) => {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: process.env.GROK_MODEL || "grok-2-1212",
+        model: process.env.GROK_MODEL || "grok-2-latest",
         messages: [{ role: 'user', content: prompt }],
         temperature: 0
       }),
@@ -121,7 +121,9 @@ app.get('/api/history', async (req, res) => {
       _grand: parseFloat(inv.grand),
       type: inv.type || 'invoice',
       discount: parseFloat(inv.discount),
-      delivery: parseFloat(inv.delivery)
+      delivery: parseFloat(inv.delivery),
+      items: typeof inv.items === 'string' ? JSON.parse(inv.items) : (inv.items || []),
+      taxes: typeof inv.taxes === 'string' ? JSON.parse(inv.taxes) : (inv.taxes || [])
     }));
     res.json(mapped);
   } catch (err) {

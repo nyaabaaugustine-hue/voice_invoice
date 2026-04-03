@@ -70,6 +70,8 @@ Rules:
                   String(now.getMonth()+1).padStart(2,'0') +
                   String(now.getDate()).padStart(2,'0') + '-' +
                   String(Math.floor(Math.random()*9000)+1000);
+    // copy taxes from settings so they can be toggled per invoice
+    const settingsTaxes = (Settings.get('taxes') || []).map(t => ({ ...t, enabled: false }));
     return {
       id:       num,
       number:   num,
@@ -83,6 +85,7 @@ Rules:
       })),
       discount: 0,
       delivery: 0,
+      taxes:    settingsTaxes,
     };
   }
 

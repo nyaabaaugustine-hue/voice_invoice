@@ -569,6 +569,104 @@ p  { line-height: 1.6; color: var(--muted); font-size: 0.9rem; }
 }
 .btn-accent:hover { background: #3de87f; transform: translateY(-1px); }
 
+/* ── DOC TYPE SWITCHER ──────────────────────────────────── */
+.doc-type-switcher {
+  display: flex;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  margin-bottom: 16px;
+  width: fit-content;
+}
+.doc-type-btn {
+  padding: 7px 20px;
+  border-radius: calc(var(--radius-md) - 2px);
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-head);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.doc-type-btn.active {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+/* ── TAX CONFIG (settings) ───────────────────────────────── */
+.tax-config-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+}
+.tax-config-item button {
+  background: none;
+  border: none;
+  color: var(--muted2);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+.tax-config-item button:hover { color: var(--red); }
+
+.tax-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  margin-top: 12px;
+}
+.tax-input-group .settings-inp { margin-bottom: 0; }
+.tax-rate-inp { width: 80px !important; flex-shrink: 0; }
+
+/* ── TAX TOGGLES (invoice page) ──────────────────────────── */
+.tax-toggle-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.tax-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: border-color 0.15s;
+}
+.tax-toggle:hover { border-color: var(--accent-dim); }
+.tax-toggle input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 16px; height: 16px;
+  cursor: pointer;
+}
+
+/* ── TAX TOTALS ROW ──────────────────────────────────────── */
+.tot-line.tax .val { color: var(--amber); }
+
+/* ── HISTORY BADGE RECEIPT ───────────────────────────────── */
+.hist-badge.receipt {
+  background: var(--amber-dim);
+  color: var(--amber);
+}
+
 /* ── HISTORY PAGE ────────────────────────────────────────── */
 .history-toolbar {
   display: flex; justify-content: space-between;
