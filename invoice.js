@@ -11,8 +11,8 @@ const Invoice = (() => {
     App.showLoading('Understanding your sale...');
 
     const prompt = `You are an invoice parser for a Ghanaian market seller. Extract invoice data from the spoken/typed description below.
-
-Return ONLY valid JSON — no markdown, no explanation, no backticks.
+Return ONLY valid JSON.
+Do not include any conversational text or markdown code blocks.
 
 Input: "${text}"
 
@@ -74,6 +74,7 @@ Rules:
       id:       num,
       number:   num,
       date:     date,
+      type:     'invoice',
       customer: customer || 'Customer',
       items:    items.map(it => ({
         name:  it.name  || 'Item',
@@ -92,17 +93,27 @@ Rules:
     const sub   = (inv.items||[]).reduce((s,it) => s + it.qty * it.price, 0);
     const disc  = Number(inv.discount) || 0;
     const del   = Number(inv.delivery) || 0;
-    const grand = Math.max(0, sub - disc + del);
-    return { sub, disc, del, grand };
+
+    const taxableAmount = Math.max(0, sub - disc);
+    const taxLines = (inv.taxes || []).filter(t => t.enabled).map(t => ({
+      name: t.name,
+      amount: taxableAmount * (Number(t.rate) / 100)
+    }));
+
+    const totalTax = taxLines.reduce((s, t) => s + t.amount, 0);
+    const grand = taxableAmount + totalTax + del;
+
+    return { sub, disc, del, taxLines, totalTax, grand };
   }
 
   // ── GENERATE PLAIN TEXT FOR SHARING ───────────────────────
   function buildInvoiceText(inv) {
     const biz  = Settings.get('biz') || 'My Business';
     const momo = Settings.get('momo') || '';
-    const { sub, disc, del, grand } = calcTotals(inv);
+    const { sub, disc, del, taxLines, grand } = calcTotals(inv);
+    const docTitle = (inv.type || 'invoice').toUpperCase();
 
-    let msg = `🧾 *INVOICE — ${biz}*\n`;
+    let msg = `🧾 *${docTitle} — ${biz}*\n`;
     msg += `━━━━━━━━━━━━━━━━━━━━\n`;
     msg += `📋 Ref: ${inv.number}\n`;
     msg += `👤 Customer: ${inv.customer}\n`;
@@ -116,6 +127,9 @@ Rules:
     msg += `━━━━━━━━━━━━━━━━━━━━\n`;
     msg += `Subtotal: GHS ${sub.toFixed(2)}\n`;
     if (disc > 0) msg += `Discount: -GHS ${disc.toFixed(2)}\n`;
+    taxLines.forEach(t => {
+      msg += `${t.name}: +GHS ${t.amount.toFixed(2)}\n`;
+    });
     if (del  > 0) msg += `Delivery: +GHS ${del.toFixed(2)}\n`;
     msg += `\n💰 *TOTAL DUE: GHS ${grand.toFixed(2)}*\n`;
     if (momo) {

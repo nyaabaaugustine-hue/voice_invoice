@@ -8,11 +8,18 @@ const InvoicePage = (() => {
     const inv = Invoice.getCurrent();
     if (!inv) return;
 
-    // header
-    document.getElementById('inv_biz').textContent      = Settings.get('biz') || 'My Business';
-    document.getElementById('inv_customer').textContent = inv.customer;
-    document.getElementById('inv_number').textContent   = inv.number;
-    document.getElementById('inv_date').textContent     = inv.date;
+    // header and dynamic title
+    const type = inv.type || 'invoice';
+    document.getElementById('inv_review_title').textContent = `Review ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    document.getElementById('inv_type_label').textContent   = type === 'invoice' ? 'Invoice No.' : 'Receipt No.';
+    document.getElementById('inv_biz').textContent          = Settings.get('biz') || 'My Business';
+    document.getElementById('inv_customer').textContent     = inv.customer;
+    document.getElementById('inv_number').textContent       = inv.number;
+    document.getElementById('inv_date').textContent         = inv.date;
+
+    // toggle state
+    document.getElementById('btn_type_invoice').classList.toggle('active', type === 'invoice');
+    document.getElementById('btn_type_receipt').classList.toggle('active', type === 'receipt');
 
     // logo logic
     const logoUrl = Settings.get('logo');
@@ -26,6 +33,7 @@ const InvoicePage = (() => {
     document.getElementById('inv_momo').value     = Settings.get('momo') || '';
 
     renderItems();
+    renderTaxes();
     recalc();
   }
 
@@ -44,12 +52,40 @@ const InvoicePage = (() => {
       </div>`).join('');
   }
 
+  function renderTaxes() {
+    const inv = Invoice.getCurrent();
+    const wrap = document.getElementById('inv_tax_toggles');
+    if (!inv.taxes || !inv.taxes.length) {
+      wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--muted2)">No taxes configured in Settings</p>';
+      return;
+    }
+    wrap.innerHTML = inv.taxes.map((t, i) => `
+      <label class="tax-toggle">
+        <input type="checkbox" ${t.enabled ? 'checked' : ''} onchange="InvoicePage.toggleTax(${i}, this.checked)">
+        <span>${t.name} (${t.rate}%)</span>
+      </label>`).join('');
+  }
+
   function updateField(i, field, value) {
     const inv = Invoice.getCurrent();
     if (!inv || !inv.items[i]) return;
     if (field === 'qty')   inv.items[i].qty   = Math.max(1, parseInt(value)||1);
     if (field === 'price') inv.items[i].price = parseFloat(value)||0;
     if (field === 'name')  inv.items[i].name  = value;
+    recalc();
+  }
+
+  function setType(type) {
+    const inv = Invoice.getCurrent();
+    if (!inv) return;
+    inv.type = type;
+    render();
+  }
+
+  function toggleTax(i, enabled) {
+    const inv = Invoice.getCurrent();
+    if (!inv || !inv.taxes[i]) return;
+    inv.taxes[i].enabled = enabled;
     recalc();
   }
 
@@ -78,7 +114,7 @@ const InvoicePage = (() => {
     inv.discount = parseFloat(document.getElementById('inv_discount').value) || 0;
     inv.delivery = parseFloat(document.getElementById('inv_delivery').value) || 0;
 
-    const { sub, disc, del, grand } = Invoice.calcTotals(inv);
+    const { sub, disc, del, taxLines, grand } = Invoice.calcTotals(inv);
 
     document.getElementById('tot_sub').textContent   = `GHS ${sub.toFixed(2)}`;
     document.getElementById('tot_grand').textContent = `GHS ${grand.toFixed(2)}`;
@@ -89,6 +125,15 @@ const InvoicePage = (() => {
     delRow.style.display  = del  > 0 ? 'flex' : 'none';
     document.getElementById('tot_disc').textContent = `- GHS ${disc.toFixed(2)}`;
     document.getElementById('tot_del').textContent  = `+ GHS ${del.toFixed(2)}`;
+
+    // Dynamically update tax rows in totals display
+    const taxRowsWrap = document.getElementById('tot_tax_rows');
+    taxRowsWrap.innerHTML = taxLines.map(t => `
+      <div class="tot-line tax">
+        <span>${t.name}</span>
+        <span class="val">+ GHS ${t.amount.toFixed(2)}</span>
+      </div>
+    `).join('');
   }
 
   async function share(channel) {
@@ -148,5 +193,5 @@ const InvoicePage = (() => {
     return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  return { render, renderItems, updateField, removeItem, addBlankItem, recalc, share, copyText, saveAndNew };
+  return { render, renderItems, updateField, setType, toggleTax, removeItem, addBlankItem, recalc, share, copyText, saveAndNew };
 })();

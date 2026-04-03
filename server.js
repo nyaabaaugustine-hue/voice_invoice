@@ -15,8 +15,18 @@ const sql = neon(process.env.DATABASE_URL);
 app.use(cors());
 app.use(express.json());
 
-// Serve static frontend files from the current directory
-app.use(express.static(path.join(__dirname)));
+// Serve static files from the root directory
+app.use(express.static(path.join(__dirname, '.')));
+
+// Handle the root route to serve index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// --- HEALTH CHECK ---
+app.get('/api', (req, res) => {
+  res.json({ status: "VoiceInvoice API is running", version: "1.0.0" });
+});
 
 // --- AI PARSING ENDPOINT ---
 app.post('/api/parse', async (req, res) => {
@@ -35,20 +45,39 @@ app.post('/api/parse', async (req, res) => {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "grok-beta",
+        model: process.env.GROK_MODEL || "grok-2-1212",
         messages: [{ role: 'user', content: prompt }],
         temperature: 0
       }),
     });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = "AI service is currently unavailable.";
+        
+        if (response.status === 401) {
+          errorMessage = "Invalid xAI API Key. Please check your .env file.";
+        } else if (response.status === 429) {
+          errorMessage = "AI Rate limit reached. Please wait a moment.";
+        }
+
+        console.error(`xAI API Error (${response.status}):`, errorText);
+        return res.status(response.status).json({ error: errorMessage });
+      }
 
     const data = await response.json();
     if (data.error) {
       return res.status(data.status || 500).json(data.error);
     }
 
-    const content = data.choices[0].message.content.replace(/```json|```/g, '').trim();
+    const rawContent = data.choices[0].message.content;
+    // Extract the JSON object even if the AI included conversational text or markdown
+    const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
+    const content = jsonMatch ? jsonMatch[0] : rawContent;
+    
     res.json(JSON.parse(content));
   } catch (err) {
+    console.error("Parsing Error:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -64,16 +93,17 @@ app.get('/api/settings', async (req, res) => {
 });
 
 app.post('/api/settings', async (req, res) => {
-  const { biz, momo, logo, wa } = req.body;
+  const { biz, momo, logo, wa, taxes } = req.body;
   try {
     await sql`
-      INSERT INTO settings (id, biz, momo, logo, wa)
-      VALUES (1, ${biz}, ${momo}, ${logo}, ${wa})
+      INSERT INTO settings (id, biz, momo, logo, wa, taxes)
+      VALUES (1, ${biz}, ${momo}, ${logo}, ${wa}, ${JSON.stringify(taxes || [])})
       ON CONFLICT (id) DO UPDATE SET
         biz = EXCLUDED.biz,
         momo = EXCLUDED.momo,
         logo = EXCLUDED.logo,
-        wa = EXCLUDED.wa
+        wa = EXCLUDED.wa,
+        taxes = EXCLUDED.taxes
     `;
     res.json({ success: true });
   } catch (err) {
@@ -89,6 +119,7 @@ app.get('/api/history', async (req, res) => {
     const mapped = result.map(inv => ({
       ...inv,
       _grand: parseFloat(inv.grand),
+      type: inv.type || 'invoice',
       discount: parseFloat(inv.discount),
       delivery: parseFloat(inv.delivery)
     }));
@@ -102,8 +133,8 @@ app.post('/api/history', async (req, res) => {
   const inv = req.body;
   try {
     await sql`
-      INSERT INTO invoices (id, customer, items, discount, delivery, grand, date)
-      VALUES (${inv.id}, ${inv.customer}, ${JSON.stringify(inv.items)}, ${inv.discount}, ${inv.delivery}, ${inv.grand}, ${inv.date})
+      INSERT INTO invoices (id, customer, items, taxes, discount, delivery, grand, date, type)
+      VALUES (${inv.id}, ${inv.customer}, ${JSON.stringify(inv.items)}, ${JSON.stringify(inv.taxes || [])}, ${inv.discount}, ${inv.delivery}, ${inv.grand}, ${inv.date}, ${inv.type || 'invoice'})
       ON CONFLICT (id) DO NOTHING
     `;
     res.json({ success: true });

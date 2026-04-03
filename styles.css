@@ -449,6 +449,70 @@ p  { line-height: 1.6; color: var(--muted); font-size: 0.9rem; }
 .field-inp:focus { outline: none; border-color: var(--accent); }
 .field-inp::placeholder { color: var(--muted2); }
 
+/* ── DOCUMENT TOGGLE ─────────────────────────────────────── */
+.doc-type-switcher {
+  display: flex;
+  background: var(--surface2);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+.doc-type-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-radius: calc(var(--radius-md) - 4px);
+  transition: all 0.2s;
+}
+.doc-type-btn.active {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+/* ── TAXES ──────────────────────────────────────────────── */
+.tax-toggle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.tax-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tax-toggle:has(input:checked) {
+  border-color: var(--accent);
+  background: rgba(78, 255, 145, 0.05);
+}
+
+.tax-toggle input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 18px;
+  height: 18px;
+}
+
+.tax-toggle span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
 /* momo box */
 .momo-box {
   background: var(--amber-dim);
@@ -543,6 +607,11 @@ p  { line-height: 1.6; color: var(--muted); font-size: 0.9rem; }
   background: var(--accent-dim); color: var(--accent);
   font-family: var(--font-mono);
 }
+.hist-badge.receipt {
+  background: var(--surface2);
+  color: var(--muted);
+  border: 1px solid var(--border-hi);
+}
 
 /* ── SETTINGS PAGE ───────────────────────────────────────── */
 .settings-section { margin-bottom: 28px; }
@@ -560,6 +629,49 @@ p  { line-height: 1.6; color: var(--muted); font-size: 0.9rem; }
   color: var(--muted); display: block;
   margin-bottom: 6px;
 }
+
+.tax-config-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  animation: fadeUp 0.2s ease;
+}
+
+.tax-config-item span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.tax-config-item button {
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  color: var(--muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.tax-input-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tax-input-group .tax-rate-inp {
+  width: 80px;
+}
+
 .settings-inp {
   width: 100%; padding: 13px 16px;
   background: var(--surface);

@@ -61,6 +61,7 @@ const History = (() => {
         + ((inv.items||[]).length > 3 ? ' …' : '');
       const amt = (inv._grand || 0).toFixed(2);
       const d   = inv.date || '';
+      const type = inv.type || 'invoice';
       return `
         <div class="hist-card" onclick="History.openInvoice(${i})">
           <div class="hist-top">
@@ -69,7 +70,10 @@ const History = (() => {
           </div>
           <div class="hist-bottom">
             <div class="hist-items mono">${itemSummary}</div>
-            <div class="hist-date">${d}</div>
+            <div style="display:flex; align-items:center; gap:8px">
+              <span class="hist-badge ${type === 'receipt' ? 'receipt' : ''}">${type === 'invoice' ? 'INV' : 'REC'}</span>
+              <div class="hist-date">${d}</div>
+            </div>
           </div>
         </div>`;
     }).join('');
