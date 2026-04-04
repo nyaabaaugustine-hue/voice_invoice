@@ -134,6 +134,8 @@ const App = (() => {
     await History.load();
     updateHeaderBiz();
     PinAuth.init();
+    PWA.init();
+    Templates.renderList();
     showPage('voice');
     // Show quick-resend pill if there's recent history
     _maybeShowQuickResend();
@@ -189,3 +191,4 @@ const Voice = (() => {
 
 // ── BOOT ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', App.init);
+

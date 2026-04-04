@@ -163,11 +163,13 @@ const History = (() => {
       const amt    = (inv._grand || 0).toFixed(2);
       const type   = inv.type || 'invoice';
       const isPaid = inv.status === 'paid';
+      // Overdue check
+      const isOverdue = !isPaid && inv.due_date && new Date(inv.due_date) < new Date();
       const realIdx = _list.indexOf(inv);
       return `
-        <div class="hist-card" onclick="History.openInvoice(${realIdx})">
+        <div class="hist-card ${isOverdue ? 'overdue' : ''}" onclick="History.openInvoice(${realIdx})">
           <div class="hist-top">
-            <div class="hist-customer">${escHtml(inv.customer)}</div>
+            <div class="hist-customer">${escHtml(inv.customer)} ${isOverdue ? '<span class="overdue-badge">🔴 OVERDUE</span>' : ''}</div>
             <div class="hist-amount">GHS ${amt}</div>
           </div>
           <div class="hist-bottom">

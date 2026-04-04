@@ -29,6 +29,9 @@ const InvoicePage = (() => {
     const momoEl  = document.getElementById('inv_momo_display');
     if (momoEl) momoEl.textContent = momo ? '📲 ' + momo : '';
 
+    // QR code for MoMo payment
+    _renderQR(momo, inv);
+
     // type switcher
     document.getElementById('btn_type_invoice').classList.toggle('active', type === 'invoice');
     document.getElementById('btn_type_receipt').classList.toggle('active', type === 'receipt');
@@ -53,6 +56,33 @@ const InvoicePage = (() => {
     renderItems();
     renderTaxes();
     recalc();
+  }
+
+  // ── QR CODE ────────────────────────────────────────────────────────
+  function _renderQR(momo, inv) {
+    const wrap = document.getElementById('inv_qr_wrap');
+    const box  = document.getElementById('inv_qr_code');
+    if (!wrap || !box) return;
+    if (!momo) { wrap.style.display = 'none'; return; }
+
+    wrap.style.display = 'flex';
+    box.innerHTML = ''; // clear old QR
+
+    const { grand } = Invoice.calcTotals(inv);
+    const qrText = `MoMo: ${momo} | Amount: GHS ${grand.toFixed(2)} | Ref: ${inv.number}`;
+
+    try {
+      new QRCode(box, {
+        text:          qrText,
+        width:         100,
+        height:        100,
+        colorDark:     '#000000',
+        colorLight:    '#ffffff',
+        correctLevel:  QRCode.CorrectLevel.M
+      });
+    } catch(e) {
+      wrap.style.display = 'none';
+    }
   }
 
   function _renderCustomerDatalist() {
