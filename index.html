@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0f1210" />
+  <meta name="theme-color" content="#090c0a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>VoiceBill — Instant Invoices</title>
@@ -11,9 +11,213 @@
 </head>
 <body>
 
+<!-- ═══════════════════════════════════════════════════════════
+     ONBOARDING SCREEN
+══════════════════════════════════════════════════════════ -->
+<div class="onboard-screen" id="onboardScreen" style="display:none">
+
+  <!-- Progress bar -->
+  <div class="ob-progress-wrap" id="obProgressWrap">
+    <div class="ob-progress-bar" id="obProgress"></div>
+  </div>
+
+  <!-- Step 0: Welcome splash -->
+  <div class="ob-step ob-active" id="ob-step-0">
+    <div class="ob-splash">
+      <div class="ob-logo-wrap">
+        <div class="ob-logo-ring">
+          <div class="ob-logo-icon">
+            <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
+            </svg>
+          </div>
+        </div>
+        <div class="ob-logo-text">Voice<span>Bill</span></div>
+      </div>
+      <h1 class="ob-headline">Invoices in<br><span class="ob-headline-accent">seconds.</span></h1>
+      <p class="ob-tagline">Speak your sale. We generate a professional invoice instantly — built for Ghanaian businesses.</p>
+      <div class="ob-features">
+        <div class="ob-feature">
+          <div class="ob-feature-icon">&#127908;</div>
+          <div class="ob-feature-text">
+            <div class="ob-feature-title">Voice to Invoice</div>
+            <div class="ob-feature-desc">Just speak, we parse</div>
+          </div>
+        </div>
+        <div class="ob-feature">
+          <div class="ob-feature-icon">&#128241;</div>
+          <div class="ob-feature-text">
+            <div class="ob-feature-title">Share Instantly</div>
+            <div class="ob-feature-desc">WhatsApp, SMS, Email</div>
+          </div>
+        </div>
+        <div class="ob-feature">
+          <div class="ob-feature-icon">&#128274;</div>
+          <div class="ob-feature-text">
+            <div class="ob-feature-title">PIN Protected</div>
+            <div class="ob-feature-desc">Your data stays private</div>
+          </div>
+        </div>
+      </div>
+      <button class="ob-cta" onclick="PinAuth.obNext()">Get Started →</button>
+      <div class="ob-flag">&#127468;&#127469; Made for Ghana</div>
+    </div>
+  </div>
+
+  <!-- Step 1: Business Name -->
+  <div class="ob-step" id="ob-step-1">
+    <div class="ob-form-wrap">
+      <div class="ob-step-badge">Step 1 of 3</div>
+      <div class="ob-step-icon">&#127981;</div>
+      <h2 class="ob-step-title">What's your business called?</h2>
+      <p class="ob-step-sub">This appears on every invoice you send.</p>
+      <input
+        class="ob-input"
+        id="ob_biz"
+        type="text"
+        placeholder="e.g. Kofi Fashion House"
+        autocomplete="organization"
+        onkeydown="if(event.key==='Enter') PinAuth.obNext()"
+      />
+      <button class="ob-cta" onclick="PinAuth.obNext()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Step 2: MoMo Number -->
+  <div class="ob-step" id="ob-step-2">
+    <div class="ob-form-wrap">
+      <div class="ob-step-badge">Step 2 of 3</div>
+      <div class="ob-step-icon">&#128178;</div>
+      <h2 class="ob-step-title">Your MoMo number</h2>
+      <p class="ob-step-sub">Customers see this on invoices so they can pay you instantly.</p>
+      <input
+        class="ob-input"
+        id="ob_momo"
+        type="tel"
+        placeholder="e.g. 0550 000 000"
+        autocomplete="tel"
+        onkeydown="if(event.key==='Enter') PinAuth.obNext()"
+      />
+      <button class="ob-cta" onclick="PinAuth.obNext()">Continue →</button>
+      <button class="ob-skip" onclick="PinAuth.obSkipMomo()">Skip for now</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Create PIN -->
+  <div class="ob-step" id="ob-step-3">
+    <div class="ob-pin-wrap">
+      <div class="ob-step-badge">Step 3 of 3</div>
+      <div class="ob-step-icon">&#128274;</div>
+      <h2 class="ob-step-title">Create your PIN</h2>
+      <p class="ob-step-sub">A 4-digit PIN protects your invoice data. You'll enter it each time you open VoiceBill.</p>
+      <div class="pin-dots" style="margin:24px auto">
+        <div class="pin-dot" id="ob_pd0"></div>
+        <div class="pin-dot" id="ob_pd1"></div>
+        <div class="pin-dot" id="ob_pd2"></div>
+        <div class="pin-dot" id="ob_pd3"></div>
+      </div>
+      <div class="pin-err" id="ob_pinErr"></div>
+      <div class="numpad">
+        <button class="np-btn" onclick="PinAuth.digit('1')">1</button>
+        <button class="np-btn" onclick="PinAuth.digit('2')">2</button>
+        <button class="np-btn" onclick="PinAuth.digit('3')">3</button>
+        <button class="np-btn" onclick="PinAuth.digit('4')">4</button>
+        <button class="np-btn" onclick="PinAuth.digit('5')">5</button>
+        <button class="np-btn" onclick="PinAuth.digit('6')">6</button>
+        <button class="np-btn" onclick="PinAuth.digit('7')">7</button>
+        <button class="np-btn" onclick="PinAuth.digit('8')">8</button>
+        <button class="np-btn" onclick="PinAuth.digit('9')">9</button>
+        <div class="np-empty"></div>
+        <button class="np-btn" onclick="PinAuth.digit('0')">0</button>
+        <button class="np-btn np-del" onclick="PinAuth.del()">&#9003;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Confirm PIN -->
+  <div class="ob-step" id="ob-step-4">
+    <div class="ob-pin-wrap">
+      <div class="ob-step-badge">Confirm PIN</div>
+      <div class="ob-step-icon ob-step-icon-confirm">&#128275;</div>
+      <h2 class="ob-step-title">Confirm your PIN</h2>
+      <p class="ob-step-sub">Enter the same 4-digit PIN again to confirm.</p>
+      <div class="pin-dots" style="margin:24px auto">
+        <div class="pin-dot" id="ob_cd0"></div>
+        <div class="pin-dot" id="ob_cd1"></div>
+        <div class="pin-dot" id="ob_cd2"></div>
+        <div class="pin-dot" id="ob_cd3"></div>
+      </div>
+      <div class="pin-err" id="ob_confirmErr"></div>
+      <div class="numpad">
+        <button class="np-btn" onclick="PinAuth.digit('1')">1</button>
+        <button class="np-btn" onclick="PinAuth.digit('2')">2</button>
+        <button class="np-btn" onclick="PinAuth.digit('3')">3</button>
+        <button class="np-btn" onclick="PinAuth.digit('4')">4</button>
+        <button class="np-btn" onclick="PinAuth.digit('5')">5</button>
+        <button class="np-btn" onclick="PinAuth.digit('6')">6</button>
+        <button class="np-btn" onclick="PinAuth.digit('7')">7</button>
+        <button class="np-btn" onclick="PinAuth.digit('8')">8</button>
+        <button class="np-btn" onclick="PinAuth.digit('9')">9</button>
+        <div class="np-empty"></div>
+        <button class="np-btn" onclick="PinAuth.digit('0')">0</button>
+        <button class="np-btn np-del" onclick="PinAuth.del()">&#9003;</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PIN AUTHENTICATION SCREEN
+══════════════════════════════════════════════════════════ -->
+<div class="pin-screen" id="pinScreen">
+  <div class="pin-screen-inner">
+    <div class="pin-logo-wrap">
+      <div class="pin-logo-icon">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
+        </svg>
+      </div>
+      <div class="pin-logo-text">Voice<span>Bill</span></div>
+    </div>
+    <div class="pin-sub" id="pinSub">Enter your PIN to continue</div>
+
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-err" id="pinErr"></div>
+
+    <div class="numpad">
+      <button class="np-btn" onclick="PinAuth.digit('1')">1</button>
+      <button class="np-btn" onclick="PinAuth.digit('2')">2</button>
+      <button class="np-btn" onclick="PinAuth.digit('3')">3</button>
+      <button class="np-btn" onclick="PinAuth.digit('4')">4</button>
+      <button class="np-btn" onclick="PinAuth.digit('5')">5</button>
+      <button class="np-btn" onclick="PinAuth.digit('6')">6</button>
+      <button class="np-btn" onclick="PinAuth.digit('7')">7</button>
+      <button class="np-btn" onclick="PinAuth.digit('8')">8</button>
+      <button class="np-btn" onclick="PinAuth.digit('9')">9</button>
+      <div class="np-empty"></div>
+      <button class="np-btn" onclick="PinAuth.digit('0')">0</button>
+      <button class="np-btn np-del" onclick="PinAuth.del()">⌫</button>
+    </div>
+
+    <div class="pin-note" id="pinNote">Your invoices are protected with a PIN</div>
+  </div>
+</div>
+
+
 <!-- ═══════════════════════════════════════════════════════
-     APP HEADER
+     MAIN APP
 ════════════════════════════════════════════════════════ -->
+<div class="main-app" id="mainApp" style="display:none">
+
+<!-- APP HEADER -->
 <header class="app-header">
   <div>
     <div class="logo">Voice<span>Bill</span></div>
@@ -22,105 +226,72 @@
   <div class="header-actions">
     <button class="icon-btn" onclick="App.showPage('history')" title="History">
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2
-             M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2
-             M9 12h6M9 16h4"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 12h6M9 16h4"/>
       </svg>
     </button>
     <button class="icon-btn" onclick="App.showPage('settings')" title="Settings">
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0
-             a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37
-             a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35
-             a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37
-             a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0
-             a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37
-             a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35
-             a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37
-             .996.608 2.296.07 2.572-1.065z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+    </button>
+    <button class="icon-btn" onclick="PinAuth.lock()" title="Lock">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
       </svg>
     </button>
   </div>
 </header>
 
 
-<!-- ═══════════════════════════════════════════════════════
-     PAGE 1 — VOICE INPUT
-════════════════════════════════════════════════════════ -->
+<!-- PAGE 1 — VOICE INPUT -->
 <section class="page active" id="page_voice">
-
   <div class="mic-hero">
     <div class="mic-tagline">speak your sale → instant invoice</div>
-
-    <!-- Mic button with ripple rings -->
     <div class="mic-ring-wrap" id="micRing">
       <div class="mic-ring r3"></div>
       <div class="mic-ring r2"></div>
       <div class="mic-ring"></div>
       <button class="mic-btn-main" id="micBtn" onclick="App.toggleMic()">
-        <svg width="44" height="44" fill="none" viewBox="0 0 24 24"
-             stroke="currentColor" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
+        <svg width="44" height="44" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
         </svg>
         <span class="mic-btn-label" id="micLabel">Tap to speak</span>
       </button>
     </div>
-
     <div class="mic-status-bar" id="micStatus">Ready</div>
-
-    <!-- Live transcript -->
     <div class="transcript-card" id="transcriptBox"></div>
   </div>
-
-  <!-- Type fallback -->
   <div class="type-fallback">
     <button class="link-btn" onclick="Voice.toggleType()">Can't use mic? Type instead ↓</button>
   </div>
   <div class="type-row" id="typeRow">
     <input class="type-inp" id="typeInp"
            placeholder="e.g. Kofi bought 2 shirts 50 cedis each…"
+           list="customerList"
            onkeydown="if(event.key==='Enter') Voice.submitType()" />
-    <button class="btn btn-accent" style="width:auto;padding:12px 18px" onclick="Voice.submitType()">
-      Go →
-    </button>
+    <button class="btn btn-accent" style="width:auto;padding:12px 18px" onclick="Voice.submitType()">Go →</button>
   </div>
-
-  <!-- Example phrases -->
+  <!-- Quick-resend last invoice -->
+  <div id="quickResendWrap" style="display:none;margin-top:12px"></div>
   <div class="mt24">
     <div class="section-label">Try saying…</div>
     <div class="example-list">
-      <button class="example-pill" onclick="Voice.useExample(this)">
-        Kofi bought 2 shirts at 50 cedis each and 1 shoe for 120 cedis
-      </button>
-      <button class="example-pill" onclick="Voice.useExample(this)">
-        Ama ordered 3 waakye for 15 cedis each and 2 pure water at 2 cedis
-      </button>
-      <button class="example-pill" onclick="Voice.useExample(this)">
-        Give Kwame invoice — 5 phone cases 30 cedis each, delivery 20 cedis
-      </button>
-      <button class="example-pill" onclick="Voice.useExample(this)">
-        Abena, 1 dress 250 cedis, 2 headbands 15 cedis each, discount 20
-      </button>
+      <button class="example-pill" onclick="Voice.useExample(this)">Kofi bought 2 shirts at 50 cedis each and 1 shoe for 120 cedis</button>
+      <button class="example-pill" onclick="Voice.useExample(this)">Ama ordered 3 waakye for 15 cedis each and 2 pure water at 2 cedis</button>
+      <button class="example-pill" onclick="Voice.useExample(this)">Give Kwame invoice — 5 phone cases 30 cedis each, delivery 20 cedis</button>
+      <button class="example-pill" onclick="Voice.useExample(this)">Abena, 1 dress 250 cedis, 2 headbands 15 cedis each, discount 20</button>
     </div>
   </div>
-
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════════
-     PAGE 2 — INVOICE REVIEW & SEND
-════════════════════════════════════════════════════════ -->
+<!-- PAGE 2 — INVOICE REVIEW & SEND -->
 <section class="page" id="page_invoice">
 
   <button class="page-back" onclick="App.showPage('voice')">
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24"
-         stroke="currentColor" stroke-width="2.5">
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
       <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
     </svg>
     New Invoice
@@ -131,46 +302,62 @@
     <button class="doc-type-btn" id="btn_type_receipt" onclick="InvoicePage.setType('receipt')">Receipt</button>
   </div>
 
-  <h2 class="page-title" id="inv_review_title">Review Invoice</h2>
-  <p class="page-sub">Edit any price, quantity or item name below</p>
+  <!-- ── BEAUTIFUL INVOICE CARD ── -->
+  <div class="inv-card" id="invoiceCard">
 
-  <!-- Invoice card -->
-  <div class="inv-card">
+    <!-- Card header with gradient -->
+    <div class="inv-card-header">
+      <div class="inv-card-header-bg"></div>
+      <div class="inv-header-content">
+        <div class="inv-brand-row">
+          <img id="inv_logo" src="" style="display:none; height:44px; border-radius:8px; margin-right:12px;" />
+          <div class="inv-biz-block">
+            <div class="inv-biz" id="inv_biz">My Business</div>
+            <div class="inv-doc-badge" id="inv_doc_badge">
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Invoice
+            </div>
+          </div>
+          <div class="inv-number-badge" id="inv_number_badge">—</div>
+        </div>
 
-    <!-- Header -->
-    <div class="inv-head">
-      <div class="inv-brand-row">
-        <img id="inv_logo" src="" style="display:none; height:40px; margin-bottom:8px;" />
-        <div class="inv-biz" id="inv_biz">My Business</div>
-      </div>
-      <div class="inv-meta-grid">
-        <div class="inv-meta-cell">
-          <div class="lbl">Customer</div>
-          <div class="val" id="inv_customer">—</div>
+        <div class="inv-parties">
+          <div class="inv-party-from">
+            <div class="inv-party-label">FROM</div>
+            <div class="inv-party-name" id="inv_biz2">My Business</div>
+            <div class="inv-party-momo" id="inv_momo_display"></div>
+          </div>
+          <div class="inv-party-arrow">
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </div>
+          <div class="inv-party-to">
+            <div class="inv-party-label">TO</div>
+            <div class="inv-party-name" id="inv_customer">—</div>
+            <div class="inv-party-date" id="inv_date">—</div>
+          </div>
         </div>
-        <div class="inv-meta-cell">
-          <div class="lbl" id="inv_type_label">Invoice No.</div>
-          <div class="val mono" id="inv_number">—</div>
-        </div>
-        <div class="inv-meta-cell" style="margin-top:10px">
-          <div class="lbl">Date</div>
-          <div class="val" id="inv_date">—</div>
+
+        <div class="inv-due-row" id="inv_due_cell" style="display:none">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Due: <span id="inv_due_display" style="color:var(--purple);margin-left:4px">—</span>
         </div>
       </div>
     </div>
 
-    <!-- Items -->
+    <!-- Items table -->
     <div class="inv-items-wrap">
       <div class="items-table-head">
         <span>Item</span>
-        <span style="text-align:right">Qty</span>
-        <span style="text-align:right">Price</span>
+        <span style="text-align:center">Qty</span>
+        <span style="text-align:right">Unit Price</span>
+        <span style="text-align:right">Total</span>
         <span></span>
       </div>
       <div id="inv_items"></div>
       <button class="add-row-btn" onclick="InvoicePage.addBlankItem()">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"
-             stroke="currentColor" stroke-width="2.5">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
         </svg>
         Add item
@@ -179,37 +366,35 @@
 
     <!-- Totals -->
     <div class="inv-totals">
-      <div class="tot-line">
-        <span>Subtotal</span>
-        <span id="tot_sub">GHS 0.00</span>
-      </div>
+      <div class="tot-line"><span>Subtotal</span><span id="tot_sub">GHS 0.00</span></div>
       <div class="tot-line discount" id="tot_disc_row" style="display:none">
-        <span>Discount</span>
-        <span class="val" id="tot_disc">—</span>
+        <span>Discount</span><span class="val" id="tot_disc">—</span>
       </div>
       <div id="tot_tax_rows"></div>
       <div class="tot-line delivery" id="tot_del_row" style="display:none">
-        <span>Delivery</span>
-        <span class="val" id="tot_del">—</span>
+        <span>Delivery</span><span class="val" id="tot_del">—</span>
       </div>
       <div class="tot-line grand">
-        <span>Total</span>
+        <span>Total Due</span>
         <span id="tot_grand">GHS 0.00</span>
       </div>
     </div>
+
+    <!-- Payment method badge inside card -->
+    <div class="inv-pay-badge" id="invPayBadge" style="display:none">
+      <span id="invPayBadgeText">💵 Cash Payment</span>
+    </div>
   </div>
 
-  <!-- Discount + Delivery -->
+  <!-- Extras -->
   <div class="extras-row">
     <div class="field-group">
       <label>Discount (GHS)</label>
-      <input class="field-inp" type="number" id="inv_discount"
-             placeholder="0" min="0" oninput="InvoicePage.recalc()" />
+      <input class="field-inp" type="number" id="inv_discount" placeholder="0" min="0" oninput="InvoicePage.recalc()" />
     </div>
     <div class="field-group">
       <label>Delivery (GHS)</label>
-      <input class="field-inp" type="number" id="inv_delivery"
-             placeholder="0" min="0" oninput="InvoicePage.recalc()" />
+      <input class="field-inp" type="number" id="inv_delivery" placeholder="0" min="0" oninput="InvoicePage.recalc()" />
     </div>
   </div>
 
@@ -220,71 +405,144 @@
   </div>
 
   <!-- MoMo box -->
-  <div class="momo-box">
+  <div class="momo-box mt16">
     <span class="momo-label">💳 MoMo / Payment Number</span>
-    <input class="momo-inp" type="tel" id="inv_momo" placeholder="055 000 0000" />
+    <input class="momo-inp" type="tel" id="inv_momo" placeholder="055 000 0000" oninput="InvoicePage.updateMomoDisplay()" />
   </div>
 
-  <!-- Action buttons -->
-  <div class="action-stack">
+  <!-- ── CUTE PAY BUTTON ── -->
+  <div class="pay-section mt16">
+    <div class="pay-section-label">Collect Payment</div>
 
+    <div class="pay-btn-wrap" id="payBtnWrap">
+      <button class="pay-btn-main" onclick="PayMenu.toggle()">
+        <div class="pay-btn-left">
+          <div class="pay-btn-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+              <line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+          </div>
+          <div class="pay-btn-texts">
+            <div class="pay-btn-title" id="payBtnTitle">Collect Payment</div>
+            <div class="pay-btn-sub" id="payBtnSub">Choose method ↓</div>
+          </div>
+        </div>
+        <div class="pay-btn-amount" id="payBtnAmount">GHS 0.00</div>
+        <svg class="pay-chevron" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+
+      <!-- Dropdown -->
+      <div class="pay-dropdown" id="payDropdown">
+        <div class="pay-method pm-cash" onclick="PayMenu.select('cash')">
+          <div class="pm-icon">💵</div>
+          <div class="pm-texts">
+            <div class="pm-name">Cash</div>
+            <div class="pm-desc">Mark as paid in cash</div>
+          </div>
+          <div class="pm-check" id="pmCheck_cash"></div>
+        </div>
+        <div class="pay-method pm-momo" onclick="PayMenu.select('momo')">
+          <div class="pm-icon">📲</div>
+          <div class="pm-texts">
+            <div class="pm-name">Mobile Money (MoMo)</div>
+            <div class="pm-desc">MTN MoMo · Vodafone Cash · AirtelTigo</div>
+          </div>
+          <div class="pm-check" id="pmCheck_momo"></div>
+        </div>
+        <div class="pay-method pm-bank" onclick="PayMenu.select('bank')">
+          <div class="pm-icon">🏦</div>
+          <div class="pm-texts">
+            <div class="pm-name">Bank Transfer</div>
+            <div class="pm-desc">Direct bank / Ghipss transfer</div>
+          </div>
+          <div class="pm-check" id="pmCheck_bank"></div>
+        </div>
+        <div class="pay-method pm-due" onclick="PayMenu.select('due')">
+          <div class="pm-icon">🗓️</div>
+          <div class="pm-texts">
+            <div class="pm-name">Set Due Date + Reminder</div>
+            <div class="pm-desc">Forward date, notify customer</div>
+          </div>
+          <div class="pm-check" id="pmCheck_due"></div>
+        </div>
+      </div>
+
+      <!-- Due Date Panel -->
+      <div class="due-panel" id="duePanel">
+        <div class="due-panel-title">📅 Set Due Date &amp; Reminder</div>
+        <div class="due-row">
+          <div class="due-field" style="flex:1">
+            <label>Due Date</label>
+            <input type="date" id="dueDateInp" onchange="PayMenu.updateDueDisplay()" />
+          </div>
+          <button class="due-set-btn" onclick="PayMenu.confirmDueDate()">Confirm</button>
+        </div>
+        <div>
+          <div class="section-label" style="margin-bottom:8px">Remind Customer</div>
+          <div class="reminder-options">
+            <div class="reminder-chip" data-days="1" onclick="PayMenu.toggleReminder(this)">1 day before</div>
+            <div class="reminder-chip" data-days="3" onclick="PayMenu.toggleReminder(this)">3 days before</div>
+            <div class="reminder-chip" data-days="7" onclick="PayMenu.toggleReminder(this)">1 week before</div>
+            <div class="reminder-chip" data-days="0" onclick="PayMenu.toggleReminder(this)">On due date</div>
+          </div>
+        </div>
+        <div class="due-info" id="dueInfo"></div>
+      </div>
+
+      <!-- Confirmed state -->
+      <div class="pay-confirmed" id="payConfirmed">
+        <div class="pay-confirmed-icon" id="payConfirmedIcon">✅</div>
+        <div class="pay-confirmed-text">
+          <div class="pay-method-chosen" id="payMethodChosen">Cash Payment</div>
+          <div class="pay-method-desc" id="payMethodDesc">Invoice marked as paid</div>
+        </div>
+        <button class="pay-change-btn" onclick="PayMenu.reset()">Change</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SHARE / SEND ── -->
+  <div class="action-stack mt16">
     <div class="share-label">Send via</div>
     <div class="share-grid">
-
       <button class="share-btn share-wa" onclick="InvoicePage.share('whatsapp')">
         <span class="share-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.121 1.529 5.845L.057 23.5l5.805-1.522A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.887 9.887 0 01-5.031-1.374l-.361-.214-3.741.981.998-3.648-.235-.374A9.861 9.861 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.42 0 9.894 4.474 9.894 9.894 0 5.42-4.474 9.894-9.894 9.894z"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.121 1.529 5.845L.057 23.5l5.805-1.522A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.887 9.887 0 01-5.031-1.374l-.361-.214-3.741.981.998-3.648-.235-.374A9.861 9.861 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.42 0 9.894 4.474 9.894 9.894 0 5.42-4.474 9.894-9.894 9.894z"/></svg>
         </span>
         <span class="share-text">WhatsApp</span>
       </button>
-
       <button class="share-btn share-tg" onclick="InvoicePage.share('telegram')">
         <span class="share-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.08 13.614l-2.95-.924c-.64-.203-.654-.64.135-.954l11.566-4.458c.537-.194 1.006.131.863.943z"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.08 13.614l-2.95-.924c-.64-.203-.654-.64.135-.954l11.566-4.458c.537-.194 1.006.131.863.943z"/></svg>
         </span>
         <span class="share-text">Telegram</span>
       </button>
-
       <button class="share-btn share-sms" onclick="InvoicePage.share('sms')">
         <span class="share-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
         </span>
         <span class="share-text">SMS</span>
       </button>
-
       <button class="share-btn share-email" onclick="InvoicePage.share('email')">
         <span class="share-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
         </span>
         <span class="share-text">Email</span>
       </button>
-
     </div>
-
     <button class="btn btn-ghost" onclick="InvoicePage.copyText()">
-      <svg width="18" height="18" fill="none" viewBox="0 0 24 24"
-           stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2
-             m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-      </svg>
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
       Copy invoice text
     </button>
-
+    <button class="btn btn-ghost" onclick="InvoicePage.exportPDF()">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      Export PDF
+    </button>
     <button class="btn btn-ghost" onclick="InvoicePage.saveAndNew()">
-      <svg width="18" height="18" fill="none" viewBox="0 0 24 24"
-           stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-      </svg>
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
       Save &amp; New Invoice
     </button>
   </div>
@@ -292,11 +550,8 @@
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════════
-     PAGE 3 — HISTORY
-════════════════════════════════════════════════════════ -->
+<!-- PAGE 3 — HISTORY -->
 <section class="page" id="page_history">
-
   <div class="history-toolbar">
     <div>
       <h2>Invoice History</h2>
@@ -307,140 +562,124 @@
       Clear all
     </button>
   </div>
-
   <div id="historyList"></div>
-
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════════
-     PAGE 4 — SETTINGS
-════════════════════════════════════════════════════════ -->
+<!-- PAGE 4 — SETTINGS -->
 <section class="page" id="page_settings">
-
   <h2 style="margin-bottom:4px">Settings</h2>
   <p style="margin-bottom:24px">Set once — used on every invoice</p>
 
-  <!-- Business info -->
   <div class="settings-section">
     <div class="settings-section-title">Business Info</div>
-
     <div class="settings-field">
       <label>Business Name</label>
-      <input class="settings-inp" type="text" id="s_biz"
-             placeholder="e.g. Kofi Fashion House" />
+      <input class="settings-inp" type="text" id="s_biz" placeholder="e.g. Kofi Fashion House" />
     </div>
-
     <div class="settings-field">
       <label>Logo URL (Public Image Link)</label>
-      <input class="settings-inp" type="text" id="s_logo"
-             placeholder="https://..." />
+      <input class="settings-inp" type="text" id="s_logo" placeholder="https://..." />
     </div>
   </div>
 
-  <!-- Payment -->
   <div class="settings-section">
     <div class="settings-section-title">Payment</div>
-
     <div class="settings-field">
       <label>MoMo Number (shown on every invoice)</label>
-      <input class="settings-inp" type="tel" id="s_momo"
-             placeholder="e.g. 0550000000" />
+      <input class="settings-inp" type="tel" id="s_momo" placeholder="e.g. 0550000000" />
     </div>
-
     <div class="settings-field">
-      <label>Your WhatsApp Number (optional — to pre-fill recipient)</label>
-      <input class="settings-inp" type="tel" id="s_wa"
-             placeholder="e.g. 233550000000 (include country code)" />
+      <label>Your WhatsApp Number (optional)</label>
+      <input class="settings-inp" type="tel" id="s_wa" placeholder="e.g. 233550000000" />
     </div>
   </div>
 
-  <!-- Taxes -->
   <div class="settings-section">
     <div class="settings-section-title">Tax Configuration</div>
     <div id="s_tax_list"></div>
+    <button class="tax-open-modal-btn" onclick="TaxModal.open('settings')">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+      </svg>
+      Add or Remove Tax
+    </button>
+    <p style="font-size:0.72rem;color:var(--muted2);margin-top:8px">Taxes added here can be toggled per invoice.</p>
+  </div>
 
-    <div class="tax-input-group">
-      <input class="settings-inp" type="text" id="s_tax_name" placeholder="Tax Name (e.g. VAT)" />
-      <input class="settings-inp tax-rate-inp" type="number" id="s_tax_rate" placeholder="%" />
-      <button class="icon-btn" onclick="Settings.addTax()" style="height:48px; width:48px; border-color:var(--accent-dim); color:var(--accent)">
-        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-        </svg>
-      </button>
-    </div>
-    <p style="font-size:0.75rem; color:var(--muted2); margin-top:8px">
-      Add taxes used in your region to toggle them on/off per invoice.
-    </p>
+  <div class="settings-section">
+    <div class="settings-section-title">Security</div>
+    <button class="settings-pin-btn" onclick="PinAuth.startChange()">
+      🔐 Change PIN
+    </button>
   </div>
 
   <button class="save-btn" onclick="Settings.submitForm()">Save Settings</button>
 
-  <!-- App info -->
   <div class="divider"></div>
   <div style="text-align:center">
-    <div style="font-size:0.75rem;color:var(--muted2);font-family:var(--font-mono)">
-      VoiceBill MVP v1.0
-    </div>
-    <div style="font-size:0.7rem;color:var(--muted2);margin-top:4px">
-      Built for Ghanaian market sellers
-    </div>
+    <div style="font-size:0.75rem;color:var(--muted2);font-family:var(--font-mono)">VoiceBill MVP v3.0</div>
+    <div style="font-size:0.7rem;color:var(--muted2);margin-top:4px">Built for Ghanaian market sellers 🇬🇭</div>
   </div>
-
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════════
-     BOTTOM NAVIGATION
-════════════════════════════════════════════════════════ -->
+<!-- BOTTOM NAVIGATION -->
 <nav class="bottom-nav">
-
   <button class="nav-item active" id="nav_voice" onclick="App.showPage('voice')">
-    <svg width="22" height="22" fill="none" viewBox="0 0 24 24"
-         stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round"
-        d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
-      <path stroke-linecap="round" stroke-linejoin="round"
-        d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
+    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
     </svg>
     Invoice
   </button>
-
   <button class="nav-item" id="nav_history" onclick="App.showPage('history')">
-    <svg width="22" height="22" fill="none" viewBox="0 0 24 24"
-         stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round"
-        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2
-           M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
     </svg>
     History
   </button>
-
   <button class="nav-item" id="nav_settings" onclick="App.showPage('settings')">
-    <svg width="22" height="22" fill="none" viewBox="0 0 24 24"
-         stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round"
-        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0
-           a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37
-           a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35
-           a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37
-           a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0
-           a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37
-           a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35
-           a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37
-           .996.608 2.296.07 2.572-1.065z"/>
-      <path stroke-linecap="round" stroke-linejoin="round"
-            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
     </svg>
     Settings
   </button>
-
 </nav>
 
+</div><!-- /main-app -->
 
-<!-- ═══════════════════════════════════════════════════════
-     LOADING OVERLAY
-════════════════════════════════════════════════════════ -->
+
+<!-- TAX MODAL -->
+<div class="modal-overlay" id="taxModalOverlay" onclick="TaxModal.closeIfBg(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Manage Taxes</div>
+      <button class="modal-close" onclick="TaxModal.close()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-add-label">Existing Taxes</div>
+      <div class="modal-tax-list" id="modalTaxList">
+        <div class="modal-empty">No taxes added yet</div>
+      </div>
+      <div class="modal-divider"></div>
+      <div class="modal-add-label">Add New Tax</div>
+      <div class="modal-add-row">
+        <input class="modal-inp" type="text" id="modal_tax_name" placeholder="Tax Name (e.g. VAT)" />
+        <input class="modal-inp rate-inp" type="number" id="modal_tax_rate" placeholder="%" min="0" max="100" step="0.1" />
+        <button class="modal-add-btn" onclick="TaxModal.add()">Save Tax</button>
+      </div>
+      <label class="modal-compound-row">
+        <input type="checkbox" id="modal_compound" />
+        Compound Tax?
+      </label>
+    </div>
+  </div>
+</div>
+
+
+<!-- LOADING OVERLAY -->
 <div class="overlay" id="loadingOverlay">
   <div class="spin"></div>
   <div class="overlay-text" id="loadingText">Processing…</div>
@@ -450,14 +689,15 @@
 <div class="toast" id="toastEl"></div>
 
 
-<!-- ═══════════════════════════════════════════════════════
-     SCRIPTS (load order matters)
-════════════════════════════════════════════════════════ -->
+<!-- SCRIPTS -->
 <script src="config.js"></script>
 <script src="settings.js"></script>
 <script src="invoice.js"></script>
 <script src="invoice-page.js"></script>
 <script src="history.js"></script>
+<script src="pay-menu.js"></script>
+<script src="tax-modal.js"></script>
+<script src="pin-auth.js"></script>
 <script src="app.js"></script>
 
 </body>
